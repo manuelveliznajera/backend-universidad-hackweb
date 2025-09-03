@@ -7,9 +7,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-//mongodb+srv://mongo_user:
-
 const uri = "mongodb+srv://mongo_user:u2DPwlF7qDXj8MSv@clusteruniversidad.xbvv7c0.mongodb.net/?retryWrites=true&w=majority&appName=ClusterUniversidad";
 
 try {
@@ -18,14 +15,7 @@ try {
 } catch (err) {
   console.error("❌ Error de conexión:", err.message);
 }
-//fin
 
-
-
-// 🔌 Conectar a MongoDB Atlas con variable de entorno
-//await mongoose.connect(process.env.MONGO_URI);
-
-// 📌 Definir esquema flexible
 const capturaSchema = new mongoose.Schema({}, { strict: false, timestamps: true });
 const Captura = mongoose.model("Captura", capturaSchema);
 
@@ -38,11 +28,11 @@ app.post("/api/capturas", async (req, res) => {
     }
 
     // Excluye 'ubicacion' de $setOnInsert para evitar conflicto
-    const updated = await Captura.findOneAndUpdate(
-      { userAgent },
-      { $set: { ubicacion, updatedAt: new Date() }, $setOnInsert: { userAgent, ...rest } },
-      { upsert: true, new: true }
-    );
+    const newCaptura = await Captura.create({
+      userAgent,
+      ubicacion,
+      ...rest
+    });
 
     res.json({ success: true, id: updated._id, updated });
   } catch (err) {
